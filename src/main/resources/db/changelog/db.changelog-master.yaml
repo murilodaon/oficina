@@ -1,0 +1,41 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 001-inicial
+      author: muril
+      changes:
+        - createTable:
+            tableName: categoria_servico
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: nome
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+  - include:
+      file: db/changelog/002-create-servico.yaml
+
+  - changeSet:
+      id: 002-adicionar-status-categoria-servico
+      author: muril
+      changes:
+        - addColumn:
+            tableName: categoria_servico
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - include:
+      file: db/changelog/003-ajusta-servico.yaml

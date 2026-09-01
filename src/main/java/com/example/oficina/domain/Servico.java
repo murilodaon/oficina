@@ -1,17 +1,46 @@
 package com.example.oficina.domain;
 
+import jakarta.persistence.*;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+@Entity
+@Table(name = "servico")
 public class Servico {
 
-    private final String codigo;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false, unique = true)
+    private String codigo;
+
+    @Column(nullable = false)
     private String descricao;
+
+    @Column(name = "horas_estimadas", nullable = false)
     private BigDecimal horasEstimadas;
+
+    @Column(name = "valor_base", nullable = false)
     private BigDecimal valorBase;
-    private final LocalDate dataCadastro;
+
+    @Column(name = "data_cadastro", nullable = false)
+    private LocalDate dataCadastro;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Status status;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(
+            name = "categoria_servico_id",
+            nullable = false
+    )
     private CategoriaServico categoriaServico;
+
+    protected Servico() {
+    }
 
     public Servico(
             String codigo,
@@ -46,6 +75,10 @@ public class Servico {
         );
 
         this.status = Status.ATIVO;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getCodigo() {
@@ -83,7 +116,9 @@ public class Servico {
         );
     }
 
-    public void alterarHorasEstimadas(BigDecimal novasHorasEstimadas) {
+    public void alterarHorasEstimadas(
+            BigDecimal novasHorasEstimadas) {
+
         this.horasEstimadas = validarNaoNegativo(
                 novasHorasEstimadas,
                 "Horas estimadas não podem ser negativas"
@@ -97,7 +132,9 @@ public class Servico {
         );
     }
 
-    public void definirCategoria(CategoriaServico categoriaServico) {
+    public void definirCategoria(
+            CategoriaServico categoriaServico) {
+
         if (categoriaServico == null) {
             throw new IllegalArgumentException(
                     "Categoria do serviço é obrigatória"
@@ -131,7 +168,7 @@ public class Servico {
             String mensagem) {
 
         if (valor == null) {
-            throw new NullPointerException(mensagem);
+            throw new IllegalArgumentException(mensagem);
         }
 
         if (valor.signum() < 0) {

@@ -1,0 +1,45 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-ajusta-servico
+      author: muril
+      changes:
+
+        - dropPrimaryKey:
+            tableName: servico
+            constraintName: servico_pkey
+
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: servico
+            columnNames: id
+            constraintName: servico_pkey
+
+        - addUniqueConstraint:
+            tableName: servico
+            columnNames: codigo
+            constraintName: uk_servico_codigo
+
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: categoria_servico_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: servico
+            baseColumnNames: categoria_servico_id
+            referencedTableName: categoria_servico
+            referencedColumnNames: id
+            constraintName: fk_servico_categoria
