@@ -39,3 +39,6 @@ databaseChangeLog:
 
   - include:
       file: db/changelog/003-ajusta-servico.yaml
+
+  - include:
+      file: db/changelog/004-fornecedor-e-estoque-minimo.yaml

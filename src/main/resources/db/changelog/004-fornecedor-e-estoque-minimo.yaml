@@ -1,0 +1,111 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 004-cria-fornecedor
+      author: muril
+      changes:
+        - createTable:
+            tableName: fornecedor
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: razao_social
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: cnpj
+                  type: VARCHAR(14)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 004-fornecedor-cnpj-unico
+      author: muril
+      changes:
+        - addUniqueConstraint:
+            tableName: fornecedor
+            columnNames: cnpj
+            constraintName: uk_fornecedor_cnpj
+
+  - changeSet:
+      id: 004-adiciona-estoque-minimo
+      author: muril
+      changes:
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: estoque_minimo
+                  type: NUMERIC(18,3)
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 004-preenche-estoque-minimo
+      author: muril
+      changes:
+        - update:
+            tableName: servico
+            columns:
+              - column:
+                  name: estoque_minimo
+                  valueNumeric: 0
+            where: estoque_minimo IS NULL
+
+  - changeSet:
+      id: 004-torna-estoque-minimo-obrigatorio
+      author: muril
+      changes:
+        - addNotNullConstraint:
+            tableName: servico
+            columnName: estoque_minimo
+            columnDataType: NUMERIC(18,3)
+
+  - changeSet:
+      id: 004-valida-estoque-minimo
+      author: muril
+      changes:
+        - sql:
+            sql: >
+              ALTER TABLE servico
+              ADD CONSTRAINT ck_servico_estoque_minimo_non_negative
+              CHECK (estoque_minimo >= 0);
+
+  - changeSet:
+      id: 004-adiciona-fornecedor-ao-servico
+      author: muril
+      changes:
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: fornecedor_id
+                  type: BIGINT
+                  constraints:
+                    nullable: true
+
+  - changeSet:
+      id: 004-cria-fk-servico-fornecedor
+      author: muril
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: servico
+            baseColumnNames: fornecedor_id
+            referencedTableName: fornecedor
+            referencedColumnNames: id
+            constraintName: fk_servico_fornecedor

@@ -1,0 +1,124 @@
+databaseChangeLog:
+
+  - changeSet:
+      id: 001-inicial
+      author: muril
+      changes:
+        - createTable:
+            tableName: categoria_servico
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: nome
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-create-servico
+      author: muril
+      changes:
+        - createTable:
+            tableName: servico
+            columns:
+              - column:
+                  name: codigo
+                  type: VARCHAR(50)
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+
+              - column:
+                  name: descricao
+                  type: VARCHAR(150)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: horas_estimadas
+                  type: NUMERIC(18,3)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: valor_base
+                  type: NUMERIC(18,2)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: data_cadastro
+                  type: DATE
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 002-adicionar-status-categoria-servico
+      author: muril
+      changes:
+        - addColumn:
+            tableName: categoria_servico
+            columns:
+              - column:
+                  name: status
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+
+  - changeSet:
+      id: 003-ajusta-servico
+      author: muril
+      changes:
+
+        - dropPrimaryKey:
+            tableName: servico
+            constraintName: servico_pkey
+
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: servico
+            columnNames: id
+            constraintName: servico_pkey
+
+        - addUniqueConstraint:
+            tableName: servico
+            columnNames: codigo
+            constraintName: uk_servico_codigo
+
+        - addColumn:
+            tableName: servico
+            columns:
+              - column:
+                  name: categoria_servico_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+        - addForeignKeyConstraint:
+            baseTableName: servico
+            baseColumnNames: categoria_servico_id
+            referencedTableName: categoria_servico
+            referencedColumnNames: id
+            constraintName: fk_servico_categoria

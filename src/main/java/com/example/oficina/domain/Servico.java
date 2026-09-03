@@ -25,6 +25,14 @@ public class Servico {
     @Column(name = "valor_base", nullable = false)
     private BigDecimal valorBase;
 
+    @Column(
+            name = "estoque_minimo",
+            nullable = false,
+            precision = 18,
+            scale = 3
+    )
+    private BigDecimal estoqueMinimo;
+
     @Column(name = "data_cadastro", nullable = false)
     private LocalDate dataCadastro;
 
@@ -32,12 +40,19 @@ public class Servico {
     @Column(nullable = false)
     private Status status;
 
-    @ManyToOne(optional = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(
             name = "categoria_servico_id",
             nullable = false
     )
     private CategoriaServico categoriaServico;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "fornecedor_id",
+            foreignKey = @ForeignKey(name = "fk_servico_fornecedor")
+    )
+    private Fornecedor fornecedor;
 
     protected Servico() {
     }
@@ -47,6 +62,24 @@ public class Servico {
             String descricao,
             BigDecimal horasEstimadas,
             BigDecimal valorBase,
+            LocalDate dataCadastro) {
+
+        this(
+                codigo,
+                descricao,
+                horasEstimadas,
+                valorBase,
+                BigDecimal.ZERO,
+                dataCadastro
+        );
+    }
+
+    public Servico(
+            String codigo,
+            String descricao,
+            BigDecimal horasEstimadas,
+            BigDecimal valorBase,
+            BigDecimal estoqueMinimo,
             LocalDate dataCadastro) {
 
         this.codigo = validarTextoObrigatorio(
@@ -67,6 +100,11 @@ public class Servico {
         this.valorBase = validarNaoNegativo(
                 valorBase,
                 "Valor base não pode ser negativo"
+        );
+
+        this.estoqueMinimo = validarNaoNegativo(
+                estoqueMinimo,
+                "Estoque mínimo não pode ser negativo"
         );
 
         this.dataCadastro = validarDataObrigatoria(
@@ -97,6 +135,10 @@ public class Servico {
         return valorBase;
     }
 
+    public BigDecimal getEstoqueMinimo() {
+        return estoqueMinimo;
+    }
+
     public LocalDate getDataCadastro() {
         return dataCadastro;
     }
@@ -107,6 +149,10 @@ public class Servico {
 
     public CategoriaServico getCategoriaServico() {
         return categoriaServico;
+    }
+
+    public Fornecedor getFornecedor() {
+        return fornecedor;
     }
 
     public void alterarDescricao(String novaDescricao) {
@@ -132,6 +178,15 @@ public class Servico {
         );
     }
 
+    public void alterarEstoqueMinimo(
+            BigDecimal novoEstoqueMinimo) {
+
+        this.estoqueMinimo = validarNaoNegativo(
+                novoEstoqueMinimo,
+                "Estoque mínimo não pode ser negativo"
+        );
+    }
+
     public void definirCategoria(
             CategoriaServico categoriaServico) {
 
@@ -142,6 +197,10 @@ public class Servico {
         }
 
         this.categoriaServico = categoriaServico;
+    }
+
+    public void definirFornecedor(Fornecedor fornecedor) {
+        this.fornecedor = fornecedor;
     }
 
     public void ativar() {
