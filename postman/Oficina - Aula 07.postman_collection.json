@@ -43,7 +43,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"nome\": \"Diagnostico Runner\"\r\n}",
+          "raw": "{\r\n  \"nome\": \"Diagnostico 11\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -81,7 +81,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"razaoSocial\": \"Auto Pecas Brasil\",\r\n  \"cnpj\": \"56789012000177\"\r\n}",
+          "raw": "{\r\n  \"razaoSocial\": \"Auto Pecas Brasil\",\r\n  \"cnpj\": \"56789012000180\"\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -119,7 +119,7 @@
         "header": [],
         "body": {
           "mode": "raw",
-          "raw": "{\r\n  \"codigo\": \"SRV-002\",\r\n  \"descricao\": \"Troca de oleo e filtro\",\r\n  \"horasEstimadas\": 1.5,\r\n  \"valorBase\": 150.00,\r\n  \"estoqueMinimo\": 1.000,\r\n  \"dataCadastro\": \"2026-09-05\",\r\n  \"categoriaServicoId\": {{categoriaId}},\r\n  \"fornecedorId\": {{fornecedorId}}\r\n}",
+          "raw": "{\r\n  \"codigo\": \"SRV-006\",\r\n  \"descricao\": \"Troca de oleo e filtro\",\r\n  \"horasEstimadas\": 1.5,\r\n  \"valorBase\": 150.00,\r\n  \"estoqueMinimo\": 1.000,\r\n  \"dataCadastro\": \"2026-09-05\",\r\n  \"categoriaServicoId\": {{categoriaId}},\r\n  \"fornecedorId\": {{fornecedorId}}\r\n}",
           "options": {
             "raw": {
               "language": "json"
@@ -262,6 +262,93 @@
             }
           }
         },
+        "url": {
+          "raw": "{{baseUrl}}/api/servicos",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "servicos"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar Categorias",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/categorias-servico",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "categorias-servico"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar Fornecedores",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/api/fornecedores",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "api",
+            "fornecedores"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Listar Servicos",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
         "url": {
           "raw": "{{baseUrl}}/api/servicos",
           "host": [
