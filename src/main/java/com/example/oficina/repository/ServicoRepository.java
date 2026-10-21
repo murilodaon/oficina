@@ -1,3 +1,4 @@
+
 package com.example.oficina.repository;
 
 import com.example.oficina.domain.Servico;
@@ -12,6 +13,8 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
     Optional<Servico> findByCodigo(String codigo);
 
     boolean existsByCodigo(String codigo);
+
+    boolean existsByCodigoAndIdNot(String codigo, Long id);
 
     List<Servico> findByCategoriaServicoId(Long categoriaServicoId);
 

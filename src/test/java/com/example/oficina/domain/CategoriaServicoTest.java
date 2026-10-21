@@ -11,17 +11,17 @@ public class CategoriaServicoTest {
     void deveCriarCategoriaComStatusAtivo() {
 
         CategoriaServico categoria = new CategoriaServico(
-                "Manutenção Preventiva"
+            "Manutenção Preventiva"
         );
 
         assertEquals(
-                "Manutenção Preventiva",
-                categoria.getNome()
+            "Manutenção Preventiva",
+            categoria.getNome()
         );
 
         assertEquals(
-                Status.ATIVO,
-                categoria.getStatus()
+            Status.ATIVO,
+            categoria.getStatus()
         );
     }
 
@@ -29,8 +29,8 @@ public class CategoriaServicoTest {
     void naoDeveCriarCategoriaComNomeVazio() {
 
         assertThrows(
-                IllegalArgumentException.class,
-                () -> new CategoriaServico(" ")
+            IllegalArgumentException.class,
+            () -> new CategoriaServico(" ")
         );
     }
 
@@ -38,14 +38,14 @@ public class CategoriaServicoTest {
     void deveInativarCategoria() {
 
         CategoriaServico categoria = new CategoriaServico(
-                "Serviços de Motor"
+            "Serviços de Motor"
         );
 
         categoria.inativar();
 
         assertEquals(
-                Status.INATIVO,
-                categoria.getStatus()
+            Status.INATIVO,
+            categoria.getStatus()
         );
     }
 
@@ -53,15 +53,48 @@ public class CategoriaServicoTest {
     void deveAtivarCategoriaInativa() {
 
         CategoriaServico categoria = new CategoriaServico(
-                "Serviços Elétricos"
+            "Serviços Elétricos"
         );
 
         categoria.inativar();
         categoria.ativar();
 
         assertEquals(
-                Status.ATIVO,
-                categoria.getStatus()
+            Status.ATIVO,
+            categoria.getStatus()
+        );
+    }
+
+    @Test
+    void deveAlterarNomeDaCategoria() {
+
+        CategoriaServico categoria = new CategoriaServico(
+            "Manutenção"
+        );
+
+        categoria.alterarNome("Manutenção Corretiva");
+
+        assertEquals(
+            "Manutenção Corretiva",
+            categoria.getNome()
+        );
+    }
+
+    @Test
+    void naoDeveAlterarNomeParaVazio() {
+
+        CategoriaServico categoria = new CategoriaServico(
+            "Manutenção"
+        );
+
+        assertThrows(
+            IllegalArgumentException.class,
+            () -> categoria.alterarNome(" ")
+        );
+
+        assertEquals(
+            "Manutenção",
+            categoria.getNome()
         );
     }
 }

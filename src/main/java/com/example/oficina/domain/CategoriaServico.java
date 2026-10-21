@@ -19,13 +19,7 @@ public class CategoriaServico {
     }
 
     public CategoriaServico(String nome) {
-        if (nome == null || nome.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Nome da categoria é obrigatório"
-            );
-        }
-
-        this.nome = nome.trim();
+        this.nome = validarNome(nome);
         this.status = Status.ATIVO;
     }
 
@@ -41,11 +35,25 @@ public class CategoriaServico {
         return status;
     }
 
+    public void alterarNome(String novoNome) {
+        this.nome = validarNome(novoNome);
+    }
+
     public void ativar() {
         this.status = Status.ATIVO;
     }
 
     public void inativar() {
         this.status = Status.INATIVO;
+    }
+
+    private static String validarNome(String nome) {
+        if (nome == null || nome.isBlank()) {
+            throw new IllegalArgumentException(
+                "Nome da categoria é obrigatório"
+            );
+        }
+
+        return nome.trim();
     }
 }
