@@ -1,4 +1,3 @@
-
 package com.example.oficina.api.controller;
 
 import com.example.oficina.api.dto.ServicoRequest;
@@ -41,18 +40,15 @@ public class ServicoController {
 
         if (request.fornecedorId() != null) {
             Fornecedor fornecedor =
-                fornecedorService.buscarPorId(
-                    request.fornecedorId()
-                );
+                fornecedorService.buscarPorId(request.fornecedorId());
 
             servico.definirFornecedor(fornecedor);
         }
 
-        Servico cadastrado =
-            servicoService.cadastrar(
-                servico,
-                request.categoriaServicoId()
-            );
+        Servico cadastrado = servicoService.cadastrar(
+            servico,
+            request.categoriaServicoId()
+        );
 
         URI location = URI.create(
             "/api/servicos/" + cadastrado.getId()
@@ -103,5 +99,13 @@ public class ServicoController {
                 .toList();
 
         return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+
+        servicoService.excluir(id);
+
+        return ResponseEntity.noContent().build();
     }
 }

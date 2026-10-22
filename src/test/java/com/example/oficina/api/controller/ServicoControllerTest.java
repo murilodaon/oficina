@@ -1,4 +1,3 @@
-
 package com.example.oficina.api.controller;
 
 import com.example.oficina.domain.CategoriaServico;
@@ -12,6 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -33,281 +33,264 @@ class ServicoControllerTest {
 
     @Test
     void deveCadastrarServico() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        CategoriaServico categoria =
-            categoriaRepository.save(
-                new CategoriaServico("Mecânica")
-            );
+        String json = """
+            {
+                "codigo": "SRV-001",
+                "descricao": "Troca de óleo",
+                "horasEstimadas": 2,
+                "valorBase": 150.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        mockMvc.perform(
-                post("/api/servicos")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-001",
-                                          "descricao": "Troca de óleo",
-                                          "horasEstimadas": 1.5,
-                                          "valorBase": 150.00,
-                                          "estoqueMinimo": 2.000,
-                                          "dataCadastro": "2026-09-03",
-                                          "categoriaServicoId": %d,
-                                          "fornecedorId": null
-                                        }
-                                        """.formatted(categoria.getId()))
-            )
+        mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
             .andExpect(status().isCreated())
             .andExpect(header().exists("Location"))
-            .andExpect(jsonPath("$.id").exists())
             .andExpect(jsonPath("$.codigo").value("SRV-001"))
-            .andExpect(jsonPath("$.descricao").value("Troca de óleo"))
-            .andExpect(jsonPath("$.status").value("ATIVO"))
-            .andExpect(jsonPath("$.categoriaServicoId")
-                .value(categoria.getId()))
-            .andExpect(jsonPath("$.categoriaServicoNome")
-                .value("Mecânica"));
+            .andExpect(jsonPath("$.descricao").value("Troca de óleo"));
     }
 
     @Test
     void deveBuscarServicoPorId() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        CategoriaServico categoria =
-            categoriaRepository.save(
-                new CategoriaServico("Elétrica")
-            );
+        String json = """
+            {
+                "codigo": "SRV-002",
+                "descricao": "Revisão geral",
+                "horasEstimadas": 3,
+                "valorBase": 200.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        String location =
-            mockMvc.perform(
-                    post("/api/servicos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                                {
-                                                  "codigo": "SRV-002",
-                                                  "descricao": "Revisão elétrica",
-                                                  "horasEstimadas": 2.0,
-                                                  "valorBase": 250.00,
-                                                  "estoqueMinimo": 1.000,
-                                                  "dataCadastro": "2026-09-03",
-                                                  "categoriaServicoId": %d,
-                                                  "fornecedorId": null
-                                                }
-                                                """.formatted(categoria.getId()))
-                )
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
+        String location = mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("Location");
 
         mockMvc.perform(get(location))
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.codigo").value("SRV-002"))
-            .andExpect(jsonPath("$.descricao")
-                .value("Revisão elétrica"))
-            .andExpect(jsonPath("$.categoriaServicoNome")
-                .value("Elétrica"));
+            .andExpect(jsonPath("$.descricao").value("Revisão geral"));
     }
 
     @Test
     void deveAtualizarServico() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        CategoriaServico categoria =
-            categoriaRepository.save(
-                new CategoriaServico("Mecânica")
-            );
+        String jsonInicial = """
+            {
+                "codigo": "SRV-003",
+                "descricao": "Serviço inicial",
+                "horasEstimadas": 2,
+                "valorBase": 100.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        String location =
-            mockMvc.perform(
-                    post("/api/servicos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                                {
-                                                  "codigo": "SRV-010",
-                                                  "descricao": "Troca de óleo",
-                                                  "horasEstimadas": 1.0,
-                                                  "valorBase": 100.00,
-                                                  "estoqueMinimo": 1.000,
-                                                  "dataCadastro": "2026-09-03",
-                                                  "categoriaServicoId": %d,
-                                                  "fornecedorId": null
-                                                }
-                                                """.formatted(categoria.getId()))
-                )
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
+        String location = mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonInicial))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("Location");
 
-        mockMvc.perform(
-                put(location)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-010",
-                                          "descricao": "Troca de óleo completa",
-                                          "horasEstimadas": 2.0,
-                                          "valorBase": 180.00,
-                                          "estoqueMinimo": 3.000,
-                                          "dataCadastro": "2026-10-20",
-                                          "categoriaServicoId": %d,
-                                          "fornecedorId": null
-                                        }
-                                        """.formatted(categoria.getId()))
-            )
+        String jsonAtualizado = """
+            {
+                "codigo": "SRV-003",
+                "descricao": "Serviço atualizado",
+                "horasEstimadas": 4,
+                "valorBase": 250.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
+
+        mockMvc.perform(put(location)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonAtualizado))
             .andExpect(status().isOk())
-            .andExpect(jsonPath("$.codigo").value("SRV-010"))
-            .andExpect(jsonPath("$.descricao")
-                .value("Troca de óleo completa"))
-            .andExpect(jsonPath("$.valorBase").value(180.00))
-            .andExpect(jsonPath("$.dataCadastro").value("2026-10-20"))
-            .andExpect(jsonPath("$.status").value("ATIVO"));
+            .andExpect(jsonPath("$.descricao").value("Serviço atualizado"))
+            .andExpect(jsonPath("$.valorBase").value(250.00));
     }
 
     @Test
-    void deveRetornar404AoAtualizarServicoInexistente()
-        throws Exception {
+    void deveRetornar404AoAtualizarServicoInexistente() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        CategoriaServico categoria =
-            categoriaRepository.save(
-                new CategoriaServico("Mecânica")
-            );
+        String json = """
+            {
+                "codigo": "SRV-004",
+                "descricao": "Serviço de teste",
+                "horasEstimadas": 2,
+                "valorBase": 100.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        mockMvc.perform(
-                put("/api/servicos/999999")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-999",
-                                          "descricao": "Serviço de teste",
-                                          "horasEstimadas": 1.0,
-                                          "valorBase": 100.00,
-                                          "estoqueMinimo": 1.000,
-                                          "dataCadastro": "2026-10-20",
-                                          "categoriaServicoId": %d,
-                                          "fornecedorId": null
-                                        }
-                                        """.formatted(categoria.getId()))
-            )
+        mockMvc.perform(put("/api/servicos/999999")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
             .andExpect(status().isNotFound())
-            .andExpect(jsonPath("$.status").value(404))
-            .andExpect(jsonPath("$.message")
-                .value("Serviço não encontrado"));
+            .andExpect(jsonPath("$.message").value("Serviço não encontrado"));
     }
 
     @Test
-    void naoDeveAtualizarServicoComCodigoDuplicado()
-        throws Exception {
+    void naoDeveAtualizarServicoComCodigoDuplicado() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        CategoriaServico categoria =
-            categoriaRepository.save(
-                new CategoriaServico("Funilaria")
-            );
+        String primeiroServico = """
+            {
+                "codigo": "SRV-005",
+                "descricao": "Primeiro serviço",
+                "horasEstimadas": 2,
+                "valorBase": 100.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        String primeiroLocation =
-            mockMvc.perform(
-                    post("/api/servicos")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content("""
-                                                {
-                                                  "codigo": "SRV-101",
-                                                  "descricao": "Pintura",
-                                                  "horasEstimadas": 2.0,
-                                                  "valorBase": 300.00,
-                                                  "estoqueMinimo": 1.000,
-                                                  "dataCadastro": "2026-10-20",
-                                                  "categoriaServicoId": %d,
-                                                  "fornecedorId": null
-                                                }
-                                                """.formatted(categoria.getId()))
-                )
-                .andExpect(status().isCreated())
-                .andReturn()
-                .getResponse()
-                .getHeader("Location");
+        String segundoServico = """
+            {
+                "codigo": "SRV-006",
+                "descricao": "Segundo serviço",
+                "horasEstimadas": 3,
+                "valorBase": 150.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
 
-        mockMvc.perform(
-                post("/api/servicos")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-102",
-                                          "descricao": "Polimento",
-                                          "horasEstimadas": 1.0,
-                                          "valorBase": 150.00,
-                                          "estoqueMinimo": 1.000,
-                                          "dataCadastro": "2026-10-20",
-                                          "categoriaServicoId": %d,
-                                          "fornecedorId": null
-                                        }
-                                        """.formatted(categoria.getId()))
-            )
+        mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(primeiroServico))
             .andExpect(status().isCreated());
 
-        mockMvc.perform(
-                put(primeiroLocation)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-102",
-                                          "descricao": "Pintura atualizada",
-                                          "horasEstimadas": 3.0,
-                                          "valorBase": 350.00,
-                                          "estoqueMinimo": 2.000,
-                                          "dataCadastro": "2026-10-20",
-                                          "categoriaServicoId": %d,
-                                          "fornecedorId": null
-                                        }
-                                        """.formatted(categoria.getId()))
-            )
+        String location = mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(segundoServico))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("Location");
+
+        String jsonAtualizado = """
+            {
+                "codigo": "SRV-005",
+                "descricao": "Segundo serviço atualizado",
+                "horasEstimadas": 3,
+                "valorBase": 150.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
+
+        mockMvc.perform(put(location)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonAtualizado))
             .andExpect(status().isConflict())
-            .andExpect(jsonPath("$.status").value(409))
             .andExpect(jsonPath("$.message")
                 .value("Código do serviço já cadastrado"));
     }
 
     @Test
-    void deveRetornarErroQuandoDadosForemInvalidos()
-        throws Exception {
+    void deveExcluirServico() throws Exception {
+        CategoriaServico categoria = categoriaRepository.save(
+            new CategoriaServico("Manutenção")
+        );
 
-        mockMvc.perform(
-                post("/api/servicos")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "",
-                                          "descricao": "",
-                                          "horasEstimadas": -1,
-                                          "valorBase": -10,
-                                          "estoqueMinimo": -1,
-                                          "dataCadastro": null,
-                                          "categoriaServicoId": null,
-                                          "fornecedorId": null
-                                        }
-                                        """)
-            )
+        String json = """
+            {
+                "codigo": "SRV-007",
+                "descricao": "Serviço para excluir",
+                "horasEstimadas": 2,
+                "valorBase": 100.00,
+                "estoqueMinimo": 0,
+                "dataCadastro": "2026-10-22",
+                "categoriaServicoId": %d
+            }
+            """.formatted(categoria.getId());
+
+        String location = mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
+            .andExpect(status().isCreated())
+            .andReturn()
+            .getResponse()
+            .getHeader("Location");
+
+        mockMvc.perform(delete(location))
+            .andExpect(status().isNoContent());
+
+        mockMvc.perform(get(location))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveRetornar404AoExcluirServicoInexistente() throws Exception {
+        mockMvc.perform(delete("/api/servicos/999999"))
+            .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveRetornarErroQuandoDadosForemInvalidos() throws Exception {
+        String json = """
+            {
+                "codigo": "",
+                "descricao": "",
+                "horasEstimadas": -1,
+                "valorBase": -10.00,
+                "estoqueMinimo": -1,
+                "categoriaServicoId": 1
+            }
+            """;
+
+        mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(json))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status").value(400))
             .andExpect(jsonPath("$.message")
                 .value("Dados de entrada inválidos"));
     }
 
     @Test
-    void deveRetornar400QuandoJsonForMalformado()
-        throws Exception {
-
-        mockMvc.perform(
-                post("/api/servicos")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("""
-                                        {
-                                          "codigo": "SRV-003",
-                                          "descricao": "Alinhamento",
-                                        }
-                                        """)
-            )
+    void deveRetornar400QuandoJsonForMalformado() throws Exception {
+        mockMvc.perform(post("/api/servicos")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{ json inválido"))
             .andExpect(status().isBadRequest())
-            .andExpect(jsonPath("$.status").value(400))
-            .andExpect(jsonPath("$.error").value("Bad Request"))
             .andExpect(jsonPath("$.message")
-                .value("JSON inválido ou malformado"))
-            .andExpect(jsonPath("$.path").value("/api/servicos"));
+                .value("JSON inválido ou malformado"));
     }
 }

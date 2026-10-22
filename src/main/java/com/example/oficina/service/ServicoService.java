@@ -1,4 +1,3 @@
-
 package com.example.oficina.service;
 
 import com.example.oficina.domain.CategoriaServico;
@@ -31,9 +30,7 @@ public class ServicoService {
     }
 
     @Transactional
-    public Servico cadastrar(
-        Servico servico,
-        Long categoriaServicoId) {
+    public Servico cadastrar(Servico servico, Long categoriaServicoId) {
 
         if (servicoRepository.existsByCodigo(servico.getCodigo())) {
             throw new RecursoDuplicadoException(
@@ -63,8 +60,7 @@ public class ServicoService {
 
         boolean codigoEmUso =
             servicoRepository.existsByCodigoAndIdNot(
-                dadosAtualizados.getCodigo(),
-                id
+                dadosAtualizados.getCodigo(), id
             );
 
         if (codigoEmUso) {
@@ -81,13 +77,9 @@ public class ServicoService {
 
         servico.alterarCodigo(dadosAtualizados.getCodigo());
         servico.alterarDescricao(dadosAtualizados.getDescricao());
-        servico.alterarHorasEstimadas(
-            dadosAtualizados.getHorasEstimadas()
-        );
+        servico.alterarHorasEstimadas(dadosAtualizados.getHorasEstimadas());
         servico.alterarValorBase(dadosAtualizados.getValorBase());
-        servico.alterarEstoqueMinimo(
-            dadosAtualizados.getEstoqueMinimo()
-        );
+        servico.alterarEstoqueMinimo(dadosAtualizados.getEstoqueMinimo());
         servico.alterarDataCadastro(dadosAtualizados.getDataCadastro());
         servico.definirCategoria(categoria);
 
@@ -102,9 +94,14 @@ public class ServicoService {
         return servicoRepository.save(servico);
     }
 
+    @Transactional
+    public void excluir(Long id) {
+        Servico servico = buscarPorId(id);
+        servicoRepository.delete(servico);
+    }
+
     @Transactional(readOnly = true)
     public Servico buscarPorId(Long id) {
-
         return servicoRepository.findById(id)
             .orElseThrow(() -> new RecursoNaoEncontradoException(
                 "Serviço não encontrado"
@@ -117,12 +114,8 @@ public class ServicoService {
     }
 
     @Transactional(readOnly = true)
-    public List<Servico> listarPorCategoria(
-        Long categoriaServicoId) {
-
-        return servicoRepository.findByCategoriaServicoId(
-            categoriaServicoId
-        );
+    public List<Servico> listarPorCategoria(Long categoriaServicoId) {
+        return servicoRepository.findByCategoriaServicoId(categoriaServicoId);
     }
 
     @Transactional(readOnly = true)
