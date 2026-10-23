@@ -1,8 +1,9 @@
-
 package com.example.oficina.repository;
 
 import com.example.oficina.domain.Servico;
 import com.example.oficina.domain.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -19,4 +20,14 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
     List<Servico> findByCategoriaServicoId(Long categoriaServicoId);
 
     List<Servico> findByStatus(Status status);
+
+    Page<Servico> findByCategoriaServicoId(
+        Long categoriaServicoId,
+        Pageable pageable
+    );
+
+    Page<Servico> findByStatus(
+        Status status,
+        Pageable pageable
+    );
 }

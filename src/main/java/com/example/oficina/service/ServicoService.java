@@ -7,6 +7,8 @@ import com.example.oficina.exception.RecursoDuplicadoException;
 import com.example.oficina.exception.RecursoNaoEncontradoException;
 import com.example.oficina.repository.CategoriaServicoRepository;
 import com.example.oficina.repository.ServicoRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -114,12 +116,36 @@ public class ServicoService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Servico> listar(Pageable pageable) {
+        return servicoRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public List<Servico> listarPorCategoria(Long categoriaServicoId) {
         return servicoRepository.findByCategoriaServicoId(categoriaServicoId);
     }
 
     @Transactional(readOnly = true)
+    public Page<Servico> listarPorCategoria(
+        Long categoriaServicoId,
+        Pageable pageable) {
+
+        return servicoRepository.findByCategoriaServicoId(
+            categoriaServicoId,
+            pageable
+        );
+    }
+
+    @Transactional(readOnly = true)
     public List<Servico> listarPorStatus(Status status) {
         return servicoRepository.findByStatus(status);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Servico> listarPorStatus(
+        Status status,
+        Pageable pageable) {
+
+        return servicoRepository.findByStatus(status, pageable);
     }
 }
