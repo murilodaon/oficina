@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.List;
 
@@ -107,32 +108,22 @@ public class ServicoController {
 
     @GetMapping("/paginado")
     public ResponseEntity<Page<ServicoResponse>> listarPaginado(
+        @RequestParam(required = false) String descricao,
+        @RequestParam(required = false) BigDecimal valorMinimo,
+        @RequestParam(required = false) BigDecimal valorMaximo,
         @RequestParam(required = false) Long categoriaServicoId,
         @RequestParam(required = false) Status status,
         @PageableDefault(size = 10, sort = "codigo")
         Pageable pageable) {
 
-        Page<Servico> servicos;
-
-        if (categoriaServicoId != null && status != null) {
-            servicos = servicoService.listarPorCategoriaEStatus(
-                categoriaServicoId,
-                status,
-                pageable
-            );
-        } else if (categoriaServicoId != null) {
-            servicos = servicoService.listarPorCategoria(
-                categoriaServicoId,
-                pageable
-            );
-        } else if (status != null) {
-            servicos = servicoService.listarPorStatus(
-                status,
-                pageable
-            );
-        } else {
-            servicos = servicoService.listar(pageable);
-        }
+        Page<Servico> servicos = servicoService.buscarComFiltros(
+            descricao,
+            valorMinimo,
+            valorMaximo,
+            categoriaServicoId,
+            status,
+            pageable
+        );
 
         Page<ServicoResponse> response =
             servicos.map(mapper::toResponse);

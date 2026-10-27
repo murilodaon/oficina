@@ -9,9 +9,11 @@ import com.example.oficina.repository.CategoriaServicoRepository;
 import com.example.oficina.repository.ServicoRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -160,5 +162,74 @@ public class ServicoService {
             status,
             pageable
         );
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Servico> buscarComFiltros(
+        String descricao,
+        BigDecimal valorMinimo,
+        BigDecimal valorMaximo,
+        Long categoriaServicoId,
+        Status status,
+        Pageable pageable) {
+
+        Specification<Servico> specification =
+            (root, query, criteriaBuilder) ->
+                criteriaBuilder.conjunction();
+
+        if (descricao != null && !descricao.isBlank()) {
+            String descricaoBusca =
+                "%" + descricao.trim().toLowerCase() + "%";
+
+            specification = specification.and(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.like(
+                        criteriaBuilder.lower(root.get("descricao")),
+                        descricaoBusca
+                    )
+            );
+        }
+
+        if (valorMinimo != null) {
+            specification = specification.and(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.greaterThanOrEqualTo(
+                        root.get("valorBase"),
+                        valorMinimo
+                    )
+            );
+        }
+
+        if (valorMaximo != null) {
+            specification = specification.and(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.lessThanOrEqualTo(
+                        root.get("valorBase"),
+                        valorMaximo
+                    )
+            );
+        }
+
+        if (categoriaServicoId != null) {
+            specification = specification.and(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(
+                        root.get("categoriaServico").get("id"),
+                        categoriaServicoId
+                    )
+            );
+        }
+
+        if (status != null) {
+            specification = specification.and(
+                (root, query, criteriaBuilder) ->
+                    criteriaBuilder.equal(
+                        root.get("status"),
+                        status
+                    )
+            );
+        }
+
+        return servicoRepository.findAll(specification, pageable);
     }
 }
