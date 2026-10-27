@@ -5,6 +5,7 @@ import com.example.oficina.api.dto.ServicoResponse;
 import com.example.oficina.api.mapper.ServicoMapper;
 import com.example.oficina.domain.Fornecedor;
 import com.example.oficina.domain.Servico;
+import com.example.oficina.domain.Status;
 import com.example.oficina.service.FornecedorService;
 import com.example.oficina.service.ServicoService;
 import jakarta.validation.Valid;
@@ -106,12 +107,35 @@ public class ServicoController {
 
     @GetMapping("/paginado")
     public ResponseEntity<Page<ServicoResponse>> listarPaginado(
+        @RequestParam(required = false) Long categoriaServicoId,
+        @RequestParam(required = false) Status status,
         @PageableDefault(size = 10, sort = "codigo")
         Pageable pageable) {
 
+        Page<Servico> servicos;
+
+        if (categoriaServicoId != null && status != null) {
+            servicos = servicoService.listarPorCategoriaEStatus(
+                categoriaServicoId,
+                status,
+                pageable
+            );
+        } else if (categoriaServicoId != null) {
+            servicos = servicoService.listarPorCategoria(
+                categoriaServicoId,
+                pageable
+            );
+        } else if (status != null) {
+            servicos = servicoService.listarPorStatus(
+                status,
+                pageable
+            );
+        } else {
+            servicos = servicoService.listar(pageable);
+        }
+
         Page<ServicoResponse> response =
-            servicoService.listar(pageable)
-                .map(mapper::toResponse);
+            servicos.map(mapper::toResponse);
 
         return ResponseEntity.ok(response);
     }

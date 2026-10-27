@@ -30,4 +30,10 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
         Status status,
         Pageable pageable
     );
+
+    Page<Servico> findByCategoriaServicoIdAndStatus(
+        Long categoriaServicoId,
+        Status status,
+        Pageable pageable
+    );
 }

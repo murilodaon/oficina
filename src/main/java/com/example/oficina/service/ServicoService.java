@@ -148,4 +148,17 @@ public class ServicoService {
 
         return servicoRepository.findByStatus(status, pageable);
     }
+
+    @Transactional(readOnly = true)
+    public Page<Servico> listarPorCategoriaEStatus(
+        Long categoriaServicoId,
+        Status status,
+        Pageable pageable) {
+
+        return servicoRepository.findByCategoriaServicoIdAndStatus(
+            categoriaServicoId,
+            status,
+            pageable
+        );
+    }
 }
