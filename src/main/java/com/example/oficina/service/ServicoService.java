@@ -1,3 +1,4 @@
+
 package com.example.oficina.service;
 
 import com.example.oficina.domain.CategoriaServico;
@@ -93,6 +94,25 @@ public class ServicoService {
             servico.definirFornecedor(
                 fornecedorService.buscarPorId(fornecedorId)
             );
+        }
+
+        return servicoRepository.save(servico);
+    }
+
+    @Transactional
+    public Servico alterarStatus(Long id, Status novoStatus) {
+        Servico servico = buscarPorId(id);
+
+        if (novoStatus == null) {
+            throw new IllegalArgumentException(
+                "O status é obrigatório"
+            );
+        }
+
+        if (novoStatus == Status.ATIVO) {
+            servico.ativar();
+        } else {
+            servico.inativar();
         }
 
         return servicoRepository.save(servico);

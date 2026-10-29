@@ -1,3 +1,4 @@
+
 package com.example.oficina.api.controller;
 
 import com.example.oficina.api.dto.ServicoRequest;
@@ -9,6 +10,7 @@ import com.example.oficina.domain.Status;
 import com.example.oficina.service.FornecedorService;
 import com.example.oficina.service.ServicoService;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -83,6 +85,21 @@ public class ServicoController {
         );
     }
 
+    @PutMapping("/{id}/status")
+    public ResponseEntity<ServicoResponse> alterarStatus(
+        @PathVariable Long id,
+        @Valid @RequestBody AlterarStatusRequest request) {
+
+        Servico atualizado = servicoService.alterarStatus(
+            id,
+            request.status()
+        );
+
+        return ResponseEntity.ok(
+            mapper.toResponse(atualizado)
+        );
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<ServicoResponse> buscarPorId(
         @PathVariable Long id) {
@@ -137,5 +154,11 @@ public class ServicoController {
         servicoService.excluir(id);
 
         return ResponseEntity.noContent().build();
+    }
+
+    public record AlterarStatusRequest(
+        @NotNull(message = "O status é obrigatório")
+        Status status
+    ) {
     }
 }
